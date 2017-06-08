@@ -1,0 +1,143 @@
+s<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	
+	<title>New York Times</title>
+	
+
+	<style>
+
+		form {
+			text-align: center;
+			float:left;
+
+		}
+		.pageHeader {
+			padding: 20px;
+			text-align: center;
+			
+		}
+
+		#buttonBox {
+			margin:10px;
+			padding-left:427px;
+
+			
+		}
+
+		.button {
+			float:left;
+			margin:8px;
+			padding:8px;
+			color:white;
+			background:#95A5A6;
+			width: 100px;
+			border-radius:6px;
+		}
+
+		.button:hover {
+			cursor:pointer;
+		}
+
+		.button:active {
+			opacity:.8;
+		}
+
+		label {
+			margin-left:15px;
+		}
+
+		input {
+			border-radius:6px;
+			box-shadow:none;
+			width:97%;
+			height:32px;
+			margin:15px;
+			border:1px solid #DCE4EC;
+		}
+
+		select {
+			margin: 10px 0 10px 16px;
+			width:97%;
+			height:42px;
+			background:white;
+			border:1px solid #DCE4EC;;
+		}
+		#articleDump {
+			text-align: center;
+			border-radius:8px;
+			margin-top:10px;
+			border:1px solid #DCE4EC;
+			min-height:60px;
+		}	
+	</style>
+	<!-- Here we include bootstrap. This will be made available to all of the generated HTML/JS that React generates-->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	<script src="http://code.jquery.com/jquery-2.1.3.min.js"></script>
+</head>
+
+<body>
+	
+	<!-- This is where React will deploy the contents it generates -->
+	<div id="app"></div>
+
+	<!-- All of our JS code will be transpiled into this bundle.js file -->
+	<script src="bundle.js"></script>
+	
+	<script type="text/javascript">
+		$("#searchButton").on("click", function() {
+			
+			event.preventDefault();
+
+			function ajaxQuery() {
+				var searchInput = $("#searchTerm").val().trim();
+				var d = document.getElementById("dropdown");
+				var recordNum = d.options[ d.selectedIndex].value;
+				var beginDate = $("#startYear").val().trim()+'0101';
+				var endDate = $("#endYear").val().trim()+'0101';
+		        // var searchInput = "house";
+		        // var beginDate = "20071121";
+		        // var endDate = "20111121";
+			    var api_key = "16181762ca3c425cb8406904af287f57";
+			    var url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
+		      	console.log(searchInput)
+		        console.log(beginDate)
+		        console.log(endDate)
+		        url += '?' + $.param({
+			        'api-key': api_key,
+			        'q': searchInput,
+			        'begin_date': beginDate,
+			        'end_date': endDate
+		        });
+		        $.ajax({
+			        url: url,
+			        method: 'GET',
+		        }).done(function(result) {
+		        	console.log(recordNum)
+		        	// var recordNum =recordVal+1;
+		            var allArticles = result.response.docs;
+	      			// console.log(allArticles[0])
+	      			for (var i = 0; i < recordNum; i++) {
+						var currentArticle = allArticles[i];
+	      				console.log(currentArticle);
+
+						var title = currentArticle.headline.main;
+						var writer = currentArticle.byline.original;
+						 var section = currentArticle.section_name;
+						 var publish_date = currentArticle.pub_date;
+						var link = currentArticle.web_url;
+						var snippet = currentArticle.snippet
+						var articleNumber = i+1;
+
+						$("#articleDump").append("<br><div><i> Article Number "+ articleNumber +"</i><br><h3>"+ title + "</h3><br><h4>"+ writer + "</h4><br><em>"+snippet+"</em><br><br><small>The "+ section + " section</small><br><small>Published: " + publish_date + "</small><br><a href="+link+">"+link+"</a></div><br>");
+	      			};
+
+		        });
+		    };
+
+		    ajaxQuery();
+		});
+	</script>
+</body>
+</html>
